@@ -76,32 +76,23 @@ function CenteredLoader() {
   );
 }
 
+const ADMIN_EMAIL = "kv@rentshield.local";
+
 function LoginCard() {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(ADMIN_EMAIL);
   const [password, setPassword] = useState("");
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [busy, setBusy] = useState(false);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
     try {
-      if (mode === "signin") {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password,
-        });
-        if (error) throw error;
-        toast.success("Signed in");
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email: email.trim(),
-          password,
-          options: { emailRedirectTo: `${window.location.origin}/admin` },
-        });
-        if (error) throw error;
-        toast.success("Account created. Check your inbox to confirm, then ask an admin to grant access.");
-      }
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      if (error) throw error;
+      toast.success("Signed in");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Authentication failed");
     } finally {
@@ -117,7 +108,7 @@ function LoginCard() {
         </div>
         <h1 className="mt-5 text-2xl font-semibold tracking-tight">Admin access</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {mode === "signin" ? "Sign in to view responses." : "Create an account, then request admin access."}
+          Sign in to view responses.
         </p>
         <form className="mt-6 space-y-4" onSubmit={onSubmit}>
           <AuthInput
@@ -125,7 +116,7 @@ function LoginCard() {
             type="email"
             value={email}
             onChange={setEmail}
-            placeholder="you@company.com"
+            placeholder={ADMIN_EMAIL}
             required
           />
           <AuthInput
@@ -142,16 +133,9 @@ function LoginCard() {
             className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-foreground text-sm font-semibold text-background transition hover:opacity-90 disabled:opacity-60"
           >
             {busy && <Loader2 className="h-4 w-4 animate-spin" />}
-            {mode === "signin" ? "Sign in" : "Create account"}
+            Sign in
           </button>
         </form>
-        <button
-          type="button"
-          onClick={() => setMode((m) => (m === "signin" ? "signup" : "signin"))}
-          className="mt-4 w-full text-center text-sm text-muted-foreground hover:text-foreground transition"
-        >
-          {mode === "signin" ? "Need an account? Sign up" : "Have an account? Sign in"}
-        </button>
       </div>
     </main>
   );
