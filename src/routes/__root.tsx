@@ -78,14 +78,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "RentShield" },
+      { name: "description", content: "Lower your Deposit and Insure your property" },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "RentShield" },
+      { property: "og:description", content: "Lower your Deposit and Insure your property" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "RentShield" },
+      { name: "twitter:description", content: "Lower your Deposit and Insure your property" },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8f3256c9-9594-4ad4-8341-3a58d2ad4b53/id-preview-094aeb13--82bd8bf9-6ef4-4ed1-aa30-dcd3b5593172.lovable.app-1780430201385.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8f3256c9-9594-4ad4-8341-3a58d2ad4b53/id-preview-094aeb13--82bd8bf9-6ef4-4ed1-aa30-dcd3b5593172.lovable.app-1780430201385.png" },
     ],
     links: [
       {
