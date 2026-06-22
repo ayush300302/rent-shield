@@ -16,6 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from backend.models import (
     DocumentType, SubmissionResponse, SignupRequest, LoginRequest,
     TokenResponse, PropertyClassifyRequest, DamageEvalRequest,
+    QuestionnaireRequest,
 )
 from backend.offer_letter_evaluation import evaluate_offer_letter
 from backend.college_evaluation import evaluate_college
@@ -23,6 +24,7 @@ from backend.bank_statement_evaluation import evaluate_bank_statement
 from backend.home_owner.home_owner_evaluation import classify_property
 from backend.damage_evaluation import evaluate_damage
 from backend.auth import signup as auth_signup, login as auth_login
+from backend.db import save_questionnaire_response
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -115,6 +117,27 @@ def evaluate_damage_route(req: DamageEvalRequest):
         "status": "success",
         "evaluation": result,
         "message": f"Damage score: {result.get('damage_score')}/9 ({result.get('damage_category')}).",
+    }
+
+
+@app.post("/questionnaire")
+def submit_questionnaire(req: QuestionnaireRequest):
+    """
+    Submit questionnaire answers for storage and processing.
+    - **user_type**: 'renter' or 'owner'
+    - **answers**: dict of { question_id: answer_value }
+    """
+    import json
+    answers_json = json.dumps(req.answers)
+    row_id = save_questionnaire_response(
+        user_email=None,  # Can be extracted from JWT token in future
+        user_type=req.user_type,
+        answers_json=answers_json,
+    )
+    return {
+        "status": "success",
+        "response_id": row_id,
+        "message": f"Questionnaire submitted successfully ({len(req.answers)} answers recorded).",
     }
 
 

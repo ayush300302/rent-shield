@@ -60,3 +60,9 @@ class DamageEvalRequest(BaseModel):
     """Request model for /evaluate-damage."""
     before_description: str
     after_description: str
+
+
+class QuestionnaireRequest(BaseModel):
+    """Request model for /questionnaire."""
+    user_type: str  # "renter" or "owner"
+    answers: dict   # { question_id: answer_value }

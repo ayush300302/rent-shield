@@ -37,6 +37,16 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS questionnaire_responses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_email TEXT,
+            user_type TEXT NOT NULL,
+            answers TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_email) REFERENCES users(email)
+        )
+    """)
     conn.commit()
 
 
@@ -62,6 +72,17 @@ def create_user(user_id: str, name: str, email: str, phone: str, role: str, pass
         return {"id": user_id, "name": name, "email": email.lower(), "phone": phone, "role": role}
     except sqlite3.IntegrityError:
         raise ValueError(f"Email '{email}' is already registered.")
+
+
+def save_questionnaire_response(user_email: str | None, user_type: str, answers_json: str) -> int:
+    """Save questionnaire answers to the database. Returns the row ID."""
+    conn = get_connection()
+    cursor = conn.execute(
+        "INSERT INTO questionnaire_responses (user_email, user_type, answers) VALUES (?, ?, ?)",
+        (user_email, user_type, answers_json),
+    )
+    conn.commit()
+    return cursor.lastrowid
 
 
 def get_all_users() -> list:

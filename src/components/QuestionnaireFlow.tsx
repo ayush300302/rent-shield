@@ -8,6 +8,7 @@ import { ProgressBar } from "@/components/ProgressBar";
 import { QuestionStep } from "@/components/QuestionStep";
 import type { Question } from "@/lib/questionnaires";
 import { signup, login } from "@/lib/api/auth";
+import { submitQuestionnaire } from "@/lib/api/submissions";
 
 type Props = {
   userType: "renter" | "owner";
@@ -75,6 +76,9 @@ export function QuestionnaireFlow({
       
       localStorage.setItem("access_token", tokens.access_token);
       localStorage.setItem("refresh_token", tokens.refresh_token);
+
+      // Submit questionnaire answers to backend
+      await submitQuestionnaire(userType, answers, tokens.access_token);
 
       navigate({ to: "/thank-you" });
     } catch (e) {
