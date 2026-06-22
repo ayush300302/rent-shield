@@ -120,3 +120,26 @@ The JSON object keys MUST match exactly:
   "transaction_volume_tier": {txn_vol_default}
 }}
 """
+
+DAMAGE_EVALUATION_PROMPT = """You are a property damage assessment AI for RentShield, a rental fintech platform in India.
+Your task is to analyze the description of before and after photos of a rental property and produce a damage score from 0 to 9.
+
+Input:
+Before Photo Description: {before_description}
+After Photo Description: {after_description}
+
+Scoring Rules:
+- Score 0: No damage at all. Property is in the same or better condition.
+- Score 1-2: Minimal cosmetic issues (minor scuffs, light wear from normal use).
+- Score 3-4: Moderate damage (stains on walls, small holes, broken fixtures, scratched floors).
+- Score 5-6: Significant damage (large holes in walls, broken doors/windows, heavy staining, damaged plumbing).
+- Score 7-8: Severe damage (structural issues, water damage, mold, destroyed flooring/walls).
+- Score 9: Total destruction (uninhabitable, fire/flood damage, complete renovation needed).
+
+Your response MUST be a valid JSON object only, with no other text, wrapping, markdown blocks (like ```json), or whitespace outside the JSON.
+The JSON object keys MUST match exactly:
+{{
+  "damage_score": {damage_default},
+  "damage_category": "{category_default}"
+}}
+"""

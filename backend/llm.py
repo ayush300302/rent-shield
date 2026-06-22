@@ -229,3 +229,52 @@ def get_heuristic_bank_evaluation(text: str) -> dict:
         "transaction_frequency_tier": txn_freq_tier,
         "transaction_volume_tier": txn_vol_tier
     }
+
+def get_heuristic_damage_evaluation(before_desc: str, after_desc: str) -> dict:
+    """Heuristic damage evaluation using keyword matching on descriptions."""
+    after = after_desc.lower()
+
+    # Keyword severity groups
+    severe_keywords = [
+        "destroyed", "uninhabitable", "fire", "flood", "collapsed", "mold",
+        "structural damage", "completely broken", "total renovation",
+    ]
+    significant_keywords = [
+        "broken door", "broken window", "large hole", "heavy stain",
+        "damaged plumbing", "water damage", "cracked wall", "smashed",
+    ]
+    moderate_keywords = [
+        "stain", "small hole", "broken fixture", "scratched floor",
+        "chipped", "cracked", "dent", "peeling paint", "discolored",
+    ]
+    minor_keywords = [
+        "scuff", "minor wear", "light scratch", "slight", "faded",
+        "normal wear", "dust", "small mark",
+    ]
+    no_damage_keywords = [
+        "no damage", "same condition", "perfect", "excellent",
+        "pristine", "clean", "well maintained", "like new",
+    ]
+
+    # Check from most severe to least
+    if any(kw in after for kw in no_damage_keywords):
+        score = 0
+        category = "no_damage"
+    elif any(kw in after for kw in severe_keywords):
+        score = 8
+        category = "severe"
+    elif any(kw in after for kw in significant_keywords):
+        score = 6
+        category = "significant"
+    elif any(kw in after for kw in moderate_keywords):
+        score = 4
+        category = "moderate"
+    elif any(kw in after for kw in minor_keywords):
+        score = 2
+        category = "minimal"
+    else:
+        # If no keywords match, assume minor damage
+        score = 3
+        category = "moderate"
+
+    return {"damage_score": score, "damage_category": category}
