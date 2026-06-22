@@ -61,3 +61,31 @@ The JSON object keys MUST match exactly:
 }}
 """
 
+COLLEGE_EVALUATION_PROMPT = """You are an AI assistant evaluating academic credentials for RentShield, a rental fintech platform in India.
+Your task is to classify a college or university into one of three tiers based on its academic reputation and prestige.
+
+Input College Name:
+{college_name}
+
+Classification Rules:
+
+1. College Tier (1, 2, or 3):
+- Tier 1: Top 200 globally ranked institutions OR top-ranked Indian institutions including:
+  IITs (IIT Bombay, IIT Delhi, IIT Madras, IIT Kanpur, IIT Kharagpur, etc.),
+  IIMs (IIM Ahmedabad, IIM Bangalore, IIM Calcutta, etc.),
+  NITs, BITS Pilani, AIIMS, Delhi University (top colleges), Jadavpur University,
+  Top international universities (MIT, Stanford, Oxford, Cambridge, Harvard, etc.).
+- Tier 2: Mid-ranked colleges including:
+  Private universities with national recognition, state universities with good standing,
+  Reputed private engineering/management colleges (e.g., VIT, Manipal, SRM, Symbiosis, NMIMS),
+  Colleges affiliated with recognized state boards.
+- Tier 3: Not well-known colleges, unrecognized institutions, local/rural colleges,
+  or any institution that does not clearly fall into Tier 1 or Tier 2.
+
+Your response MUST be a valid JSON object only, with no other text, wrapping, markdown blocks (like ```json), or whitespace outside the JSON.
+The JSON object key MUST match exactly:
+{{
+  "college_tier": {college_default}
+}}
+"""
+

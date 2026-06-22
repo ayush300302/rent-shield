@@ -129,3 +129,30 @@ def get_heuristic_offer_letter_evaluation(text: str) -> dict:
         "salary_tier": salary_tier
     }
 
+def get_heuristic_college_evaluation(college_name: str) -> dict:
+    """Heuristic college classification using keyword matching."""
+    c = college_name.lower().strip()
+
+    # Tier 1: IITs, IIMs, NITs, top global universities
+    t1_keywords = [
+        "iit", "iim", "bits pilani", "aiims", "nit ", "national institute of technology",
+        "delhi university", "jadavpur", "mit", "stanford", "oxford", "cambridge",
+        "harvard", "columbia", "caltech", "iisc", "indian institute of science",
+        "indian institute of technology", "indian institute of management",
+    ]
+    # Tier 2: Known private universities and reputed state colleges
+    t2_keywords = [
+        "vit", "manipal", "srm", "symbiosis", "nmims", "amity", "lpu",
+        "christ university", "anna university", "mumbai university", "pune university",
+        "osmania", "bangalore university", "bu bhopal", "savitribai phule",
+        "calcutta university", "madras university", "shivaji university",
+    ]
+
+    if any(kw in c for kw in t1_keywords):
+        college_tier = 1
+    elif any(kw in c for kw in t2_keywords):
+        college_tier = 2
+    else:
+        college_tier = 3
+
+    return {"college_tier": college_tier}
