@@ -37,4 +37,5 @@ venv/
 backend/venv/
 __pycache__/
 *.pyc
-
+*.db
+.env

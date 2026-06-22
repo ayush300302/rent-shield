@@ -1,6 +1,6 @@
 """
 Authentication module for RentShield.
-Simple in-memory user store for development. Replace with a database in production.
+Uses SQLite database for persistent user storage.
 """
 
 import os
@@ -10,15 +10,16 @@ import bcrypt
 import jwt
 from typing import Optional
 
+from backend.db import init_db, get_user_by_email, create_user
+
 # JWT Configuration
 JWT_SECRET = os.getenv("JWT_SECRET", "rentshield-dev-secret-key-change-in-prod")
 JWT_ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_SECONDS = 3600       # 1 hour
 REFRESH_TOKEN_EXPIRE_SECONDS = 86400 * 7  # 7 days
 
-# In-memory user store (replace with DB in production)
-# Structure: { email: { "id", "name", "email", "phone", "role", "password_hash" } }
-_users_db: dict = {}
+# Initialize DB on import
+init_db()
 
 
 def hash_password(password: str) -> str:
@@ -55,22 +56,22 @@ def decode_token(token: str) -> Optional[dict]:
 
 def signup(role: str, name: str, phone: str, email: str, password: str) -> dict:
     """
-    Register a new user.
+    Register a new user (persisted to SQLite).
     Returns: {"user_id": str, "message": str} on success.
     Raises: ValueError if email already registered.
     """
-    if email.lower() in _users_db:
-        raise ValueError(f"Email '{email}' is already registered.")
-
     user_id = str(uuid.uuid4())
-    _users_db[email.lower()] = {
-        "id": user_id,
-        "name": name,
-        "email": email.lower(),
-        "phone": phone,
-        "role": role,
-        "password_hash": hash_password(password),
-    }
+    password_hash = hash_password(password)
+
+    # create_user raises ValueError if email already exists
+    create_user(
+        user_id=user_id,
+        name=name,
+        email=email,
+        phone=phone,
+        role=role,
+        password_hash=password_hash,
+    )
 
     return {"user_id": user_id, "message": "User registered successfully."}
 
@@ -81,7 +82,7 @@ def login(email: str, password: str) -> dict:
     Returns: {"access_token": str, "refresh_token": str, "token_type": "bearer"}
     Raises: ValueError if credentials are invalid.
     """
-    user = _users_db.get(email.lower())
+    user = get_user_by_email(email)
     if not user:
         raise ValueError("Invalid email or password.")
 
