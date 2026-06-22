@@ -47,3 +47,16 @@ class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
+
+
+class PropertyClassifyRequest(BaseModel):
+    """Request model for /classify-property."""
+    location: str
+    rent: float
+    deposit: float  # number of months
+
+
+class DamageEvalRequest(BaseModel):
+    """Request model for /evaluate-damage."""
+    before_description: str
+    after_description: str

@@ -13,11 +13,15 @@ from fastapi.middleware.cors import CORSMiddleware
 # Ensure backend package is importable
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from backend.models import DocumentType, SubmissionResponse, SignupRequest, LoginRequest, TokenResponse
+from backend.models import (
+    DocumentType, SubmissionResponse, SignupRequest, LoginRequest,
+    TokenResponse, PropertyClassifyRequest, DamageEvalRequest,
+)
 from backend.offer_letter_evaluation import evaluate_offer_letter
 from backend.college_evaluation import evaluate_college
 from backend.bank_statement_evaluation import evaluate_bank_statement
 from backend.home_owner.home_owner_evaluation import classify_property
+from backend.damage_evaluation import evaluate_damage
 from backend.auth import signup as auth_signup, login as auth_login
 
 logging.basicConfig(level=logging.INFO)
@@ -77,6 +81,41 @@ def login_route(req: LoginRequest):
         return TokenResponse(**tokens)
     except ValueError as e:
         raise HTTPException(status_code=401, detail=str(e))
+
+
+@app.post("/classify-property")
+def classify_property_route(req: PropertyClassifyRequest):
+    """
+    Classify a rental property based on location, rent, and deposit.
+    Returns tier scores (1/2/3) for each dimension.
+    """
+    result = classify_property(
+        location=req.location,
+        rent=req.rent,
+        deposit=req.deposit,
+    )
+    return {
+        "status": "success",
+        "evaluation": result,
+        "message": f"Property classified: Location Tier {result.get('location')}, Rent Tier {result.get('rent')}, Deposit Tier {result.get('deposit_neededd')}.",
+    }
+
+
+@app.post("/evaluate-damage")
+def evaluate_damage_route(req: DamageEvalRequest):
+    """
+    Evaluate property damage by comparing before and after descriptions.
+    Returns a damage score (0-9) and category.
+    """
+    result = evaluate_damage(
+        before_description=req.before_description,
+        after_description=req.after_description,
+    )
+    return {
+        "status": "success",
+        "evaluation": result,
+        "message": f"Damage score: {result.get('damage_score')}/9 ({result.get('damage_category')}).",
+    }
 
 
 @app.post("/submit", response_model=SubmissionResponse)
