@@ -16,6 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from backend.models import DocumentType, SubmissionResponse
 from backend.offer_letter_evaluation import evaluate_offer_letter
 from backend.college_evaluation import evaluate_college
+from backend.bank_statement_evaluation import evaluate_bank_statement
 from backend.home_owner.home_owner_evaluation import classify_property
 
 logging.basicConfig(level=logging.INFO)
@@ -107,13 +108,19 @@ async def submit_document(
             )
 
         elif document_type == DocumentType.BANK_ACCOUNT_STATEMENT:
-            # Bank statement evaluation placeholder
+            text = _extract_text_from_pdf(tmp_path)
+            if not text.strip():
+                raise HTTPException(
+                    status_code=422,
+                    detail="Could not extract text from the bank statement PDF. Ensure it is not image-only.",
+                )
+            result = evaluate_bank_statement(text)
             return SubmissionResponse(
                 status="success",
                 document_type=document_type.value,
                 filename=file.filename,
-                evaluation={"note": "Bank statement evaluation coming soon."},
-                message="Bank statement received and stored. Full evaluation pipeline is under development.",
+                evaluation=result,
+                message=f"Bank statement evaluated: Age Tier {result.get('account_age_tier')}, Frequency Tier {result.get('transaction_frequency_tier')}, Volume Tier {result.get('transaction_volume_tier')}.",
             )
 
     finally:

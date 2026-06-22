@@ -156,3 +156,76 @@ def get_heuristic_college_evaluation(college_name: str) -> dict:
         college_tier = 3
 
     return {"college_tier": college_tier}
+
+def get_heuristic_bank_evaluation(text: str) -> dict:
+    """Heuristic bank statement evaluation using regex parsing."""
+    import re
+    from datetime import datetime
+
+    # --- Account Age ---
+    # Look for dates in various formats (DD/MM/YYYY, DD-MM-YYYY, YYYY-MM-DD)
+    date_patterns = [
+        r'\b(\d{2})[/-](\d{2})[/-](20\d{2})\b',  # DD/MM/YYYY or DD-MM-YYYY
+        r'\b(20\d{2})[/-](\d{2})[/-](\d{2})\b',   # YYYY-MM-DD
+    ]
+    all_years = set()
+    for pattern in date_patterns:
+        matches = re.findall(pattern, text)
+        for m in matches:
+            for part in m:
+                if len(part) == 4 and part.startswith("20"):
+                    all_years.add(int(part))
+
+    if all_years:
+        year_span = max(all_years) - min(all_years)
+        if year_span >= 3:
+            account_age_tier = 1
+        elif year_span >= 1:
+            account_age_tier = 2
+        else:
+            account_age_tier = 3
+    else:
+        account_age_tier = 3
+
+    # --- Transaction Frequency ---
+    # Count lines that look like transactions (have amounts with digits)
+    amount_pattern = r'(?:Rs\.?|INR|₹)\s*[\d,]+\.?\d*'
+    txn_matches = re.findall(amount_pattern, text, re.IGNORECASE)
+    txn_count = len(txn_matches)
+
+    # Estimate monthly: if we found a year span, use it
+    months = max(len(all_years) * 12, 1) if all_years else 1
+    avg_txn_per_month = txn_count / months
+
+    if avg_txn_per_month > 20:
+        txn_freq_tier = 1
+    elif avg_txn_per_month >= 5:
+        txn_freq_tier = 2
+    else:
+        txn_freq_tier = 3
+
+    # --- Transaction Volume ---
+    # Extract numeric amounts
+    raw_amounts = re.findall(r'[\d,]+\.?\d*', " ".join(txn_matches))
+    total_credits = 0
+    for amt_str in raw_amounts:
+        try:
+            val = float(amt_str.replace(",", ""))
+            total_credits += val
+        except ValueError:
+            pass
+
+    avg_monthly_credit = total_credits / months if months > 0 else 0
+
+    if avg_monthly_credit > 100000:
+        txn_vol_tier = 1
+    elif avg_monthly_credit >= 25000:
+        txn_vol_tier = 2
+    else:
+        txn_vol_tier = 3
+
+    return {
+        "account_age_tier": account_age_tier,
+        "transaction_frequency_tier": txn_freq_tier,
+        "transaction_volume_tier": txn_vol_tier
+    }

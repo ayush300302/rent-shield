@@ -89,3 +89,34 @@ The JSON object key MUST match exactly:
 }}
 """
 
+BANK_STATEMENT_EVALUATION_PROMPT = """You are a financial analyst AI for RentShield, a rental fintech platform in India.
+Your task is to evaluate a bank account statement (text extracted from PDF) and score the applicant on three dimensions.
+
+Input Bank Statement Text:
+{text}
+
+Scoring Rules:
+
+1. Account Age Tier (1, 2, or 3):
+- Tier 1: Account is older than 3 years (look for account opening date, statement history spanning 3+ years).
+- Tier 2: Account is between 1 and 3 years old.
+- Tier 3: Account is less than 1 year old, or account age cannot be determined.
+
+2. Transaction Frequency Tier (1, 2, or 3):
+- Tier 1: More than 20 transactions per month on average (very active account).
+- Tier 2: Between 5 and 20 transactions per month on average.
+- Tier 3: Fewer than 5 transactions per month, or too few to determine.
+
+3. Transaction Volume Tier (1, 2, or 3):
+- Tier 1: Average monthly credit/inflow exceeds 1,00,000 INR (1 Lakh+).
+- Tier 2: Average monthly credit/inflow is between 25,000 and 1,00,000 INR.
+- Tier 3: Average monthly credit/inflow is less than 25,000 INR, or cannot be determined.
+
+Your response MUST be a valid JSON object only, with no other text, wrapping, markdown blocks (like ```json), or whitespace outside the JSON.
+The JSON object keys MUST match exactly:
+{{
+  "account_age_tier": {account_age_default},
+  "transaction_frequency_tier": {txn_freq_default},
+  "transaction_volume_tier": {txn_vol_default}
+}}
+"""
