@@ -7,7 +7,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { ProgressBar } from "@/components/ProgressBar";
 import { QuestionStep } from "@/components/QuestionStep";
 import type { Question } from "@/lib/questionnaires";
-import { submitResponse } from "@/lib/responses.functions";
+import { signup, login } from "@/lib/api/auth";
 
 type Props = {
   userType: "renter" | "owner";
@@ -26,12 +26,11 @@ export function QuestionnaireFlow({
 }: Props) {
   const router = useRouter();
   const navigate = useNavigate();
-  const submit = useServerFn(submitResponse);
 
   const total = questions.length;
   const [step, setStep] = useState(0); // 0..total-1 questions, total = result/lead form
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [lead, setLead] = useState({ name: "", phone: "", email: "" });
+  const [lead, setLead] = useState({ name: "", phone: "", email: "", password: "" });
   const [submitting, setSubmitting] = useState(false);
 
   const onSelect = (qid: string, value: string) => {
@@ -49,6 +48,7 @@ export function QuestionnaireFlow({
     if (lead.name.trim().length < 2) return "Please enter your name";
     if (!/^[+\d\s\-()]{7,20}$/.test(lead.phone.trim())) return "Enter a valid phone number";
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(lead.email.trim())) return "Enter a valid email";
+    if (lead.password.length < 6) return "Password must be at least 6 characters";
     return null;
   };
 
@@ -60,15 +60,22 @@ export function QuestionnaireFlow({
     }
     setSubmitting(true);
     try {
-      await submit({
-        data: {
-          user_type: userType,
-          answers,
-          name: lead.name.trim(),
-          phone: lead.phone.trim(),
-          email: lead.email.trim().toLowerCase(),
-        },
+      await signup({
+        role: userType,
+        name: lead.name.trim(),
+        phone: lead.phone.trim(),
+        email: lead.email.trim().toLowerCase(),
+        password: lead.password,
       });
+
+      const tokens = await login({
+        email: lead.email.trim().toLowerCase(),
+        password: lead.password,
+      });
+      
+      localStorage.setItem("access_token", tokens.access_token);
+      localStorage.setItem("refresh_token", tokens.refresh_token);
+
       navigate({ to: "/thank-you" });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Submission failed");
@@ -142,6 +149,13 @@ export function QuestionnaireFlow({
                 placeholder="you@email.com"
                 inputMode="email"
               />
+              <Input
+                label="Password"
+                value={lead.password}
+                onChange={(v) => setLead({ ...lead, password: v })}
+                placeholder="Minimum 6 characters"
+                type="password"
+              />
             </div>
           </div>
         )}
@@ -191,18 +205,20 @@ function Input({
   onChange,
   placeholder,
   inputMode,
+  type = "text",
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
   inputMode?: "text" | "tel" | "email";
+  type?: string;
 }) {
   return (
     <label className="block">
       <span className="mb-1.5 block text-sm font-medium text-foreground">{label}</span>
       <input
-        type="text"
+        type={type}
         inputMode={inputMode}
         value={value}
         onChange={(e) => onChange(e.target.value)}
