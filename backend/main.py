@@ -13,11 +13,12 @@ from fastapi.middleware.cors import CORSMiddleware
 # Ensure backend package is importable
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from backend.models import DocumentType, SubmissionResponse
+from backend.models import DocumentType, SubmissionResponse, SignupRequest, LoginRequest, TokenResponse
 from backend.offer_letter_evaluation import evaluate_offer_letter
 from backend.college_evaluation import evaluate_college
 from backend.bank_statement_evaluation import evaluate_bank_statement
 from backend.home_owner.home_owner_evaluation import classify_property
+from backend.auth import signup as auth_signup, login as auth_login
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -41,6 +42,41 @@ app.add_middleware(
 @app.get("/")
 def root():
     return {"status": "ok", "service": "RentShield API", "version": "0.1.0"}
+
+
+@app.post("/auth/signup")
+def signup_route(req: SignupRequest):
+    """
+    Register a new user.
+    - **role**: 'renter' or 'owner'
+    - **name**: Full name
+    - **phone**: Phone number
+    - **email**: Email address
+    - **password**: Password (min 6 chars recommended)
+    """
+    try:
+        result = auth_signup(
+            role=req.role,
+            name=req.name,
+            phone=req.phone,
+            email=req.email,
+            password=req.password,
+        )
+        return {"status": "success", **result}
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+
+
+@app.post("/auth/login", response_model=TokenResponse)
+def login_route(req: LoginRequest):
+    """
+    Login with email and password. Returns JWT access and refresh tokens.
+    """
+    try:
+        tokens = auth_login(email=req.email, password=req.password)
+        return TokenResponse(**tokens)
+    except ValueError as e:
+        raise HTTPException(status_code=401, detail=str(e))
 
 
 @app.post("/submit", response_model=SubmissionResponse)
