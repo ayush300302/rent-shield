@@ -34,3 +34,30 @@ The JSON object keys MUST match exactly:
 }}
 Note the spelling of "deposit_neededd" with a double 'd'.
 """
+
+OFFER_LETTER_EVALUATION_PROMPT = """You are an AI assistant designed to evaluate job offer letters for RentShield.
+Your task is to analyze the text extracted from an offer letter and classify both the company tier and the salary tier based on the following rules.
+
+Input Offer Letter Text:
+{text}
+
+Classification Rules:
+
+1. Company Tier (1, 2, or 3):
+- Tier 1: Top-tier companies (e.g., MAANG: Meta, Apple, Amazon, Netflix, Google; top global tech/finance firms, major multinationals like Microsoft, Uber, Goldman Sachs, TCS, Infosys, Wipro, or companies with very large revenues and thousands of employees).
+- Tier 2: Average-sized companies (e.g., mid-sized startups or established firms with around 100-500 employees, stable revenues, or known brands that are not massive conglomerates).
+- Tier 3: Unknown, small startups, local businesses, or tiny companies with low headcount and tiny revenues.
+
+2. Salary Tier (1, 2, or 3):
+- Tier 3: Monthly or annual salary corresponds to less than 4 Lakhs Per Annum (Salary < 4 LPA, or roughly < 33,000 INR per month).
+- Tier 2: Monthly or annual salary corresponds to between 4 LPA and 10 LPA inclusive (4 LPA <= Salary <= 10 LPA, or roughly 33,000 to 83,000 INR per month).
+- Tier 1: Monthly or annual salary corresponds to greater than 10 Lakhs Per Annum (Salary > 10 LPA, or roughly > 83,000 INR per month).
+
+Your response MUST be a valid JSON object only, with no other text, wrapping, markdown blocks (like ```json), or whitespace outside the JSON.
+The JSON object keys MUST match exactly:
+{{
+  "company_tier": {company_default},
+  "salary_tier": {salary_default}
+}}
+"""
+

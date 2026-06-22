@@ -78,3 +78,54 @@ def get_heuristic_property_classification(location: str, rent: int, deposit: int
         "rent": rent_tier,
         "deposit_neededd": deposit_tier
     }
+
+def get_heuristic_offer_letter_evaluation(text: str) -> dict:
+    """Heuristic offer letter parser using regex and keyword matching."""
+    import re
+    t = text.lower().strip()
+    
+    # 1. Company Tier classification heuristic
+    t1_keywords = ["google", "meta", "apple", "amazon", "netflix", "microsoft", "uber", "goldman", "tcs", "infosys", "wipro"]
+    t2_keywords = ["midstart", "average", "techcorp", "150 employees", "mid-sized", "medium"]
+    
+    if any(kw in t for kw in t1_keywords):
+        company_tier = 1
+    elif any(kw in t for kw in t2_keywords):
+        company_tier = 2
+    else:
+        company_tier = 3
+        
+    # 2. Salary Tier classification heuristic
+    salary_tier = 3  # Default to tier 3 (<4 LPA)
+    
+    # Check for LPA patterns: e.g. "15 LPA", "15 Lakhs Per Annum"
+    lpa_match = re.search(r'(\d+(?:\.\d+)?)\s*(?:lpa|lakh|lakhs)', t)
+    if lpa_match:
+        val = float(lpa_match.group(1))
+        if val > 10.0:
+            salary_tier = 1
+        elif val >= 4.0:
+            salary_tier = 2
+        else:
+            salary_tier = 3
+    else:
+        # Check for monthly salary patterns: e.g. "INR 1,25,000", "Rs. 50,000"
+        monthly_match = re.search(r'(?:inr|rs\.?)\s*(\d+(?:,\d+)*)', t)
+        if monthly_match:
+            try:
+                monthly_val = int(monthly_match.group(1).replace(',', ''))
+                annual = monthly_val * 12
+                if annual > 1000000:
+                    salary_tier = 1
+                elif annual >= 400000:
+                    salary_tier = 2
+                else:
+                    salary_tier = 3
+            except ValueError:
+                pass
+                
+    return {
+        "company_tier": company_tier,
+        "salary_tier": salary_tier
+    }
+
