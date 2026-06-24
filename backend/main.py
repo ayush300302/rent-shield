@@ -11,7 +11,20 @@ from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 # Ensure backend package is importable
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+
+# If running in an environment where 'backend' folder contents are at the root (like Railway with root directory 'backend')
+# we inject a dummy 'backend' package in sys.modules pointing to the current directory
+# so that imports of the form 'from backend.xxx import' work correctly.
+if not os.path.exists(os.path.join(parent_dir, "backend")):
+    import types
+    backend_module = types.ModuleType('backend')
+    backend_module.__path__ = [current_dir]
+    sys.modules['backend'] = backend_module
+
+sys.path.insert(0, parent_dir)
+sys.path.insert(0, current_dir)
 
 from backend.models import (
     DocumentType, SubmissionResponse, SignupRequest, LoginRequest,
