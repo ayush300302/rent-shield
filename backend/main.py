@@ -50,6 +50,39 @@ def root():
     return {"status": "ok", "service": "RentShield API", "version": "0.1.0"}
 
 
+@app.get("/debug-data")
+def debug_data_route():
+    """Debug endpoint to retrieve SQLite database contents."""
+    from backend.db import get_connection
+    conn = get_connection()
+    try:
+        users_rows = conn.execute("SELECT id, name, email, phone, role, created_at FROM users").fetchall()
+        responses_rows = conn.execute("SELECT id, user_email, user_type, answers, created_at FROM questionnaire_responses").fetchall()
+        
+        import json
+        responses = []
+        for r in responses_rows:
+            try:
+                answers_parsed = json.loads(r["answers"])
+            except Exception:
+                answers_parsed = r["answers"]
+            responses.append({
+                "id": r["id"],
+                "user_email": r["user_email"],
+                "user_type": r["user_type"],
+                "answers": answers_parsed,
+                "created_at": r["created_at"]
+            })
+            
+        return {
+            "status": "success",
+            "users": [dict(u) for u in users_rows],
+            "questionnaire_responses": responses
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
 @app.post("/auth/signup")
 def signup_route(req: SignupRequest):
     """
