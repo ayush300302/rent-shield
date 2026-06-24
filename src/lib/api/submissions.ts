@@ -82,3 +82,31 @@ export async function submitDocument(
 
   return response.json();
 }
+
+/**
+ * Submit property before/after condition descriptions for damage evaluation.
+ */
+export async function evaluateDamage(
+  beforeDescription: string,
+  afterDescription: string,
+  token?: string,
+) {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const response = await fetch(`${API_BASE_URL}/evaluate-damage`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      before_description: beforeDescription,
+      after_description: afterDescription,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || 'Damage evaluation failed');
+  }
+
+  return response.json();
+}

@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ThankYouRouteImport } from './routes/thank-you'
 import { Route as RenterRouteImport } from './routes/renter'
+import { Route as PropertyClassifyRouteImport } from './routes/property-classify'
 import { Route as OwnerRouteImport } from './routes/owner'
+import { Route as DamageEvalRouteImport } from './routes/damage-eval'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -25,9 +27,19 @@ const RenterRoute = RenterRouteImport.update({
   path: '/renter',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PropertyClassifyRoute = PropertyClassifyRouteImport.update({
+  id: '/property-classify',
+  path: '/property-classify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OwnerRoute = OwnerRouteImport.update({
   id: '/owner',
   path: '/owner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DamageEvalRoute = DamageEvalRouteImport.update({
+  id: '/damage-eval',
+  path: '/damage-eval',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -44,14 +56,18 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/damage-eval': typeof DamageEvalRoute
   '/owner': typeof OwnerRoute
+  '/property-classify': typeof PropertyClassifyRoute
   '/renter': typeof RenterRoute
   '/thank-you': typeof ThankYouRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/damage-eval': typeof DamageEvalRoute
   '/owner': typeof OwnerRoute
+  '/property-classify': typeof PropertyClassifyRoute
   '/renter': typeof RenterRoute
   '/thank-you': typeof ThankYouRoute
 }
@@ -59,22 +75,48 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/damage-eval': typeof DamageEvalRoute
   '/owner': typeof OwnerRoute
+  '/property-classify': typeof PropertyClassifyRoute
   '/renter': typeof RenterRoute
   '/thank-you': typeof ThankYouRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/owner' | '/renter' | '/thank-you'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/damage-eval'
+    | '/owner'
+    | '/property-classify'
+    | '/renter'
+    | '/thank-you'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/owner' | '/renter' | '/thank-you'
-  id: '__root__' | '/' | '/admin' | '/owner' | '/renter' | '/thank-you'
+  to:
+    | '/'
+    | '/admin'
+    | '/damage-eval'
+    | '/owner'
+    | '/property-classify'
+    | '/renter'
+    | '/thank-you'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/damage-eval'
+    | '/owner'
+    | '/property-classify'
+    | '/renter'
+    | '/thank-you'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  DamageEvalRoute: typeof DamageEvalRoute
   OwnerRoute: typeof OwnerRoute
+  PropertyClassifyRoute: typeof PropertyClassifyRoute
   RenterRoute: typeof RenterRoute
   ThankYouRoute: typeof ThankYouRoute
 }
@@ -95,11 +137,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RenterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/property-classify': {
+      id: '/property-classify'
+      path: '/property-classify'
+      fullPath: '/property-classify'
+      preLoaderRoute: typeof PropertyClassifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/owner': {
       id: '/owner'
       path: '/owner'
       fullPath: '/owner'
       preLoaderRoute: typeof OwnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/damage-eval': {
+      id: '/damage-eval'
+      path: '/damage-eval'
+      fullPath: '/damage-eval'
+      preLoaderRoute: typeof DamageEvalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -122,7 +178,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  DamageEvalRoute: DamageEvalRoute,
   OwnerRoute: OwnerRoute,
+  PropertyClassifyRoute: PropertyClassifyRoute,
   RenterRoute: RenterRoute,
   ThankYouRoute: ThankYouRoute,
 }

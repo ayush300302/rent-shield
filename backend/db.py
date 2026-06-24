@@ -7,8 +7,11 @@ import os
 import sqlite3
 import threading
 
-# Database file path (stored alongside the backend code)
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "rentshield.db")
+# Database file path (checks environment variable first for custom/persistent paths)
+DB_PATH = os.getenv(
+    "DATABASE_PATH",
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "rentshield.db")
+)
 
 # Thread-local storage for connections (SQLite connections are not thread-safe)
 _local = threading.local()

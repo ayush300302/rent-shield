@@ -62,6 +62,55 @@ function Landing() {
           />
         </section>
 
+        <section className="mt-16 md:mt-20">
+          <div className="text-center md:text-left mb-8">
+            <h2 className="text-2xl font-semibold tracking-tight">Core Assessment Tools</h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Direct access to our underlying analytical and evaluation engines.
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Link
+              to="/property-classify"
+              className="group flex flex-col justify-between rounded-2xl border border-border bg-card p-6 transition-all hover:shadow-card hover:border-accent"
+            >
+              <div>
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10 text-accent mb-4">
+                  <Home className="h-4 w-4" />
+                </span>
+                <h3 className="text-lg font-semibold tracking-tight group-hover:text-accent transition">
+                  Property Tier Classifier
+                </h3>
+                <p className="text-sm text-muted-foreground mt-1.5">
+                  Calculate rental location density, rent bracket tiers, and baseline security deposit risks.
+                </p>
+              </div>
+              <span className="text-xs font-semibold text-foreground mt-4 inline-flex items-center gap-1">
+                Open Classifier <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </Link>
+            <Link
+              to="/damage-eval"
+              className="group flex flex-col justify-between rounded-2xl border border-border bg-card p-6 transition-all hover:shadow-card hover:border-destructive"
+            >
+              <div>
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-destructive/10 text-destructive mb-4">
+                  <ShieldCheck className="h-4 w-4" />
+                </span>
+                <h3 className="text-lg font-semibold tracking-tight group-hover:text-destructive transition">
+                  Property Damage Evaluator
+                </h3>
+                <p className="text-sm text-muted-foreground mt-1.5">
+                  Compare move-in vs. move-out inspection descriptions to score damage severity levels.
+                </p>
+              </div>
+              <span className="text-xs font-semibold text-foreground mt-4 inline-flex items-center gap-1">
+                Open Evaluator <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </Link>
+          </div>
+        </section>
+
         <section className="mt-20 grid gap-8 md:grid-cols-3">
           <Feature
             icon={<TrendingDown className="h-5 w-5" />}
